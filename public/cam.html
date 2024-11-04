@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture Image</title>
+    <style>
+        #uploadButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Capture Image</h1>
+    <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="handleFileSelect(event)">
+    <button id="uploadButton" onclick="document.getElementById('fileInput').click()">Upload</button>
+
+    <script>
+        function handleFileSelect(event) {
+            const fileList = event.target.files;
+            if (fileList.length > 0) {
+                const file = fileList[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // 이미지를 미리보기로 표시
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.width = 200; // 원하는 크기로 조정
+                    document.body.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>

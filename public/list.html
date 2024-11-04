@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신고 내역</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color:rgba(255,255,255,0);
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f2f2f2;
+            padding: 1.5vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 90%;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 3.5vw;
+            font-weight: bold;
+            margin-bottom: 1.5vh;
+        }
+
+        .report-card {
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5vh;
+            padding: 1.5vh;
+        }
+
+        .report-card img {
+            width: 15%;
+            height: 100%;
+            border-radius: 10px;
+            margin-right: 15px;
+        }
+
+        .report-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title {
+            font-size: 3.5vw;
+            font-weight: bold;
+            margin-bottom: 1.5vh;
+        }
+
+        .name {
+            font-size: 2.5vw;
+            color: #555;
+        }
+
+        .role {
+            font-size: 2.5vw;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">신고 내역</div>
+        <div id="report-list"></div> <!-- Container for dynamically added reports -->
+    </div>
+
+    <script>
+        async function fetchReports() {
+            try {
+                const response = await fetch('http://192.168.0.87:8080/api/reports/user/robot70345@gmail.com');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                const reports = await response.json();
+
+                const reportList = document.getElementById('report-list');
+                reports.forEach(report => {
+                    const reportCard = document.createElement('div');
+                    reportCard.className = 'report-card';
+
+                    const image = document.createElement('img');
+                    image.src = report.image || 'default-image.jpg'; // Placeholder if no image is provided
+                    image.alt = report.description || 'Report Image';
+
+                    const reportInfo = document.createElement('div');
+                    reportInfo.className = 'report-info';
+
+                    const title = document.createElement('div');
+                    title.className = 'title';
+                    title.textContent = report.description || 'No Description';
+
+                    // name 부분 삭제
+                    // const name = document.createElement('div');
+                    // name.className = 'name';
+                    // name.textContent = report.user?.email || 'Unknown User';
+
+                    const role = document.createElement('div');
+                    role.className = 'role';
+                    role.textContent = `Lat: ${report.latitude}, Lon: ${report.longitude}`;
+
+                    reportInfo.appendChild(title);
+                    // reportInfo.appendChild(name); // name 추가 코드도 삭제
+                    reportInfo.appendChild(role);
+
+                    reportCard.appendChild(image);
+                    reportCard.appendChild(reportInfo);
+                    reportList.appendChild(reportCard);
+                });
+            } catch (error) {
+                console.error('Error fetching reports:', error);
+            }
+        }
+
+        // Call the function to fetch and display reports
+        fetchReports();
+
+    </script>
+</body>
+</html>
