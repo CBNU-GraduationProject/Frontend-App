@@ -18,6 +18,10 @@ app.get('/list', (req, res) => {
 });
 
 // 2nd.html로 가는 경로 설정
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 app.get('/cam', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'cam.html'));
 });

@@ -3,35 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capture Image</title>
+    <title>수동신고</title>
     <style>
-        #uploadButton {
-            padding: 10px 20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color:rgba(255,255,255,0);
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            background-color: #f2f2f2;
+            padding: 1.5vh;
+        }
+        .box{
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5vh;
+            padding: 1.5vh;
+        }
+
+        #captureButton {
+            padding: 1.5vh 5vh;
+            font-size: 2.5vw;
+
+        }
+        #locationButton, #dateButton {
+            margin-top: 10px;
+            padding: 1vh 1.5vh;
             font-size: 16px;
-            cursor: pointer;
+
+        }
+        #nameInput {
+            margin-top: 1vh;
+            padding: 1vh;
+            font-size: 2.5vw;
         }
     </style>
 </head>
 <body>
-    <h1>Capture Image</h1>
-    <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="handleFileSelect(event)">
-    <button id="uploadButton" onclick="document.getElementById('fileInput').click()">Upload</button>
+    <div id="box">
+        <h1>수동신고</h1>
+        <!-- 카메라로 촬영하도록 input 설정 -->
+        <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="handleFileSelect(event)">
+        <!-- 촬영 버튼 -->
+        <button id="captureButton" onclick="document.getElementById('fileInput').click()">Capture Image</button>
+        <!-- 이미지 업로드 후 표시 -->
+        <div id="imageContainer"></div>
+        <!-- GPS 출력 버튼 -->
+        <button id="locationButton" onclick="getLocation()">Show GPS</button>
+        <div id="gpsOutput"></div>
+        <!-- 날짜 및 시간 출력 버튼 -->
+        <button id="dateButton" onclick="showDateTime()">Show Date & Time</button>
+        <div id="dateTimeOutput"></div>
+        <!-- 위험물명 입력 박스 -->
+        <input type="text" id="nameInput" placeholder="위험물 명">
+    </div>
+
 
     <script>
+        // 이미지 파일 처리
         function handleFileSelect(event) {
             const fileList = event.target.files;
             if (fileList.length > 0) {
                 const file = fileList[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    // 이미지를 미리보기로 표시
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.width = 200; // 원하는 크기로 조정
-                    document.body.appendChild(img);
+                    const imageContainer = document.getElementById('imageContainer');
+                    imageContainer.innerHTML = ''; // 이전 이미지를 지우기
+                    imageContainer.appendChild(img);
                 };
                 reader.readAsDataURL(file);
             }
+        }
+
+        // GPS 출력 함수
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const gpsOutput = document.getElementById('gpsOutput');
+                    gpsOutput.innerHTML = `Latitude: ${lat}, Longitude: ${lon}`;
+                }, function() {
+                    alert("Geolocation not supported or permission denied.");
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // 현재 날짜와 시간 출력 함수
+        function showDateTime() {
+            const now = new Date();
+            const dateTimeOutput = document.getElementById('dateTimeOutput');
+            dateTimeOutput.innerHTML = `Current Date & Time: ${now.toLocaleString()}`;
         }
     </script>
 </body>
