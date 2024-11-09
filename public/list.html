@@ -2,8 +2,19 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        window.onload = function() {
+            const token = localStorage.getItem('authToken');
+            const userid = localStorage.getItem('userId');
+            
+            if (!token || !userid) {
+                alert('로그인을 먼저 해주세요');
+                window.location.href = 'login';
+                return;
+            }
+        }
+    </script>
     <title>신고 내역</title>
     <style>
         * {
@@ -73,6 +84,17 @@
             font-size: 2.5vw;
             color: #aaa;
         }
+
+        .date{
+            font-size: 2.5vw;
+            color: #aaa;
+        }
+
+        .state{
+            font-size: 2.5vw;
+            color: #aaa;
+        }
+
     </style>
 </head>
 <body>
@@ -82,55 +104,109 @@
     </div>
 
     <script>
-        async function fetchReports() {
-            try {
-                const response = await fetch('https://kickapp-dubydbancaath2e2.koreacentral-01.azurewebsites.net/api/reports/user/robot70345@gmail.com');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
+        async function fetchUserEmail(userId, token) {
+            const userApiUrl = `https://kickapp-dubydbancaath2e2.koreacentral-01.azurewebsites.net/api/users/${userId}`;
+            const response = await fetch(userApiUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-                const reports = await response.json();
+            });
 
-                const reportList = document.getElementById('report-list');
-                reports.forEach(report => {
-                    const reportCard = document.createElement('div');
-                    reportCard.className = 'report-card';
+            if (!response.ok) {
+                throw new Error('Failed to fetch user email');
+            }
 
-                    const image = document.createElement('img');
-                    image.src = report.image || 'default-image.jpg'; // Placeholder if no image is provided
-                    image.alt = report.description || 'Report Image';
+            const userData = await response.json();
+            return userData.email;
+        }
 
-                    const reportInfo = document.createElement('div');
-                    reportInfo.className = 'report-info';
+        async function fetchReports(email, token) {
+            const reportApiUrl = `https://kickapp-dubydbancaath2e2.koreacentral-01.azurewebsites.net/api/reports/user/${email}`;
+            const response = await fetch(reportApiUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
 
-                    const title = document.createElement('div');
-                    title.className = 'title';
-                    title.textContent = report.description || 'No Description';
+            if (!response.ok) {
+                throw new Error('Failed to fetch reports');
+            }
 
-                    // name 부분 삭제
-                    // const name = document.createElement('div');
-                    // name.className = 'name';
-                    // name.textContent = report.user?.email || 'Unknown User';
+            const reports = await response.json();
+            const reportList = document.getElementById('report-list');
+            reportList.innerHTML = '';
 
-                    const role = document.createElement('div');
-                    role.className = 'role';
-                    role.textContent = `Lat: ${report.latitude}, Lon: ${report.longitude}`;
+            reports.forEach(report => {
+                const reportCard = document.createElement('div');
+                reportCard.className = 'report-card';
 
-                    reportInfo.appendChild(title);
-                    // reportInfo.appendChild(name); // name 추가 코드도 삭제
-                    reportInfo.appendChild(role);
+                const image = document.createElement('img');
+                if (report.image) {
+                    // base64로 변환된 이미지 출력
+                    image.src = `data:image/jpeg;base64,${report.image}`;
+                } else {
+                    image.src = 'default-image.jpg';
+                }
+                image.alt = report.description || 'Report Image';
 
-                    reportCard.appendChild(image);
-                    reportCard.appendChild(reportInfo);
-                    reportList.appendChild(reportCard);
+                const reportInfo = document.createElement('div');
+                reportInfo.className = 'report-info';
+
+                const title = document.createElement('div');
+                title.className = 'title';
+                title.textContent = report.description || 'No Description';
+
+                const state = document.createElement('div');
+                state.className = 'state';
+                state.textContent = `상태 :  ${report.state}`;
+
+                const date = document.createElement('div');
+                date.className = 'date';
+                
+                // createdAt을 Date 객체로 변환하고, 이를 포맷팅
+                const createdAt = new Date(report.createdAt);
+                const formattedDate = createdAt.toLocaleString('ko-KR', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric'
                 });
+
+                date.textContent = `날짜: ${formattedDate}`;
+
+                const role = document.createElement('div');
+                role.className = 'role';
+                role.textContent = `위도: ${report.latitude}, 경도: ${report.longitude}`;
+
+                reportInfo.appendChild(title);
+                reportInfo.appendChild(state);
+                reportInfo.appendChild(date); // 시간 추가
+                reportInfo.appendChild(role);
+
+                reportCard.appendChild(image);
+                reportCard.appendChild(reportInfo);
+                reportList.appendChild(reportCard);
+            });
+        }
+
+        async function initializeReports() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const userId = localStorage.getItem('userId');
+                if (!token) throw new Error('Token not found');
+
+                const email = await fetchUserEmail(userId, token);
+                await fetchReports(email, token);
             } catch (error) {
-                console.error('Error fetching reports:', error);
+                console.error('Error:', error);
             }
         }
 
-        // Call the function to fetch and display reports
-        fetchReports();
-
+        initializeReports();
     </script>
 </body>
 </html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        .container { max-width: 300px; margin: auto; }
+        .form { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Profile</h2>
+        <form id="editProfileForm" class="form">
+            <input type="text" id="editSchool" placeholder="School">
+            <input type="password" id="editPassword" placeholder="New Password">
+            <button type="submit">Save Changes</button>
+        </form>
+        <p id="editMessage"></p>
+    </div>
+
+    <script>
+         document.addEventListener('DOMContentLoaded', async function() {
+            const token = localStorage.getItem('authToken');
+            const userid = localStorage.getItem('userId');
+            
+            if (!token || !userid) {
+                alert('로그인을 먼저 해주세요');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 회원정보 수정 제출
+            document.getElementById('editProfileForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const school = document.getElementById('editSchool').value.trim();
+                const password = document.getElementById('editPassword').value.trim();
+
+                try {
+                    const response = await fetch(`https://kickapp-dubydbancaath2e2.koreacentral-01.azurewebsites.net/api/users/${userid}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ school, password })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to update profile');
+
+                    document.getElementById('editMessage').innerText = 'Profile updated successfully!';
+                    window.location.href = '/mypage';
+                } catch (error) {
+                    document.getElementById('editMessage').innerText = 'Failed to update profile';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

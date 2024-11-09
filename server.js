@@ -1,23 +1,25 @@
 const express = require('express');
 const app = express();
-const PORT = 5000;
-
+const PORT = 5500;
 const path = require('path');
+
+// public 폴더 내의 image 폴더를 정적 파일로 제공
+app.use('/image', express.static(path.join(__dirname, 'public', 'image')));
+
 // 서버를 5500 포트에서 시작합니다.
 app.listen(PORT, () => {
     console.log(`Express server is running on port ${PORT}`);
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'test.html'));
+    res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
-// 2nd.html로 가는 경로 설정
+// 다른 HTML 파일에 대한 경로 설정
 app.get('/list', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'list.html'));
 });
 
-// 2nd.html로 가는 경로 설정
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
@@ -25,6 +27,15 @@ app.get('/login', (req, res) => {
 app.get('/cam', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'cam.html'));
 });
+
+app.get('/mypage', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'mypage.html'));
+});
+
+
+
+
+
 
 
 // '/' 경로에 대해 Axios 요청을 처리합니다.

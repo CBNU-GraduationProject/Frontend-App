@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1, user-scalable=0">
+    <script>
+        window.onload = function() {
+            const token = localStorage.getItem('authToken');
+            const userid = localStorage.getItem('userId');
+            
+            if (!token || !userid) {
+                alert('로그인을 먼저 해주세요');
+                window.location.href = 'login';
+                return;
+            }
+        }
+    </script>
     <style>
         * {
             -webkit-tap-highlight-color:rgba(255,255,255,0);
@@ -43,6 +55,7 @@
 
         /* 대여하기 버튼 스타일 */
         .bottom-bar-wrapper button {
+            border: none;
             flex: 1;
             padding: 1.5vh;
             margin: 0 1vw;
@@ -57,18 +70,19 @@
         .bottom-bar {
             display: flex;
             justify-content: space-around;
-            padding: 1.5vh; /* 화면 높이에 비례한 패딩 */
-            background-color: #f9f9f9;
+            background-color: #fff;
         }
 
         #b {
             flex: 1;
             padding: 1.5vh;
+            padding-top: 0;
             margin: 0 1vw;
             background-color: #fff;
+            border:none;
             font-weight: bold;
             border-radius: 10px;
-            font-size: 3.5vw; 
+            font-size: 2.5vw; 
         }
         
         .locate-btn-wrapper {
@@ -91,6 +105,17 @@
             font-size: 3.5vw;
             font-weight: bold;
         }
+        .bottom-bar button {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #menu {
+            width: 60%;
+            height: 70%;
+        }
     </style>
 </head>
 <body>
@@ -107,10 +132,10 @@
             <button>대여하기</button>
         </div>
         <div class="bottom-bar">
-            <button id="b">마이페이지</button>
-            <button id="b" onclick="location.href='/list'">신고 내역</button>
-            <button id="b" onclick="location.href='/cam'">촬영하기</button>
-            <button id="b">설정</button>
+            <button id="b" onclick="location.href='/mypage'"> <img id = "menu" src="image/mypage.png" alt="">마이페이지</button>
+            <button id="b" onclick="location.href='/list'"><img id = "menu" src="image/list.png" alt="">신고 내역</button>
+            <button id="b" onclick="location.href='/cam'"><img id = "menu" src="image/cam.png" alt="">촬영하기</button>
+            <button id="b"><img id = "menu" src="image/setting.png" alt="">설정</button>
         </div>
     </div>
 
